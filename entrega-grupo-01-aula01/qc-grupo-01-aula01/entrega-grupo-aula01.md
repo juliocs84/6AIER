@@ -118,18 +118,18 @@ SLA mínimo = 1 − 1/8.760 = 0,999886 → **≥ 99,9886%**. Na prática, o nív
 
 | Item | AWS | Azure | GCP | Notas (tipo) |
 |------|-----|-------|-----|--------------|
-| 2 × VM (2 vCPU / 8 GB) | US$ 140,16 | US$ 140,16 | US$ 97,84 | AWS `m6i.large` US$ 0,096/h · Azure `D2s_v5` US$ 0,096/h · GCP `e2-standard-2` US$ 0,067/h |
+| 2 × VM (2 vCPU / 8 GB) | US$ 140,16 | US$ 140,16 | US$ 97,84 | AWS `t3.large` US$ 0,096/h · Azure `D2s_v5` US$ 0,096/h · GCP `e2-standard-2` US$ 0,067/h |
 | 500 GB storage | US$ 11,50 | ≈ US$ 9,00 | US$ 10,00 | S3 Standard US$ 0,023/GB · Blob Hot LRS ≈ US$ 0,018/GB · GCS Standard US$ 0,020/GB (sem requisições nem egress) |
-| Banco gerenciado (2 vCPU / 8 GB / 100 GB) | US$ 141,44 | US$ 141,44 | US$ 118,18 | RDS PostgreSQL `db.m5.large` US$ 0,178/h + 100 GB gp2 (US$ 11,50) · Azure PG Flexible `D2ds_v5` ≈ US$ 0,178/h + 100 GB (US$ 11,50) · Cloud SQL Enterprise: 2 × US$ 0,0413 + 8 × US$ 0,007 por hora (US$ 101,18) + 100 GB SSD a US$ 0,17 (US$ 17,00) |
+| Banco gerenciado (2 vCPU / 8 GB / 100 GB) | US$ 141,44 | US$ 141,44 | US$ 118,18 | RDS PostgreSQL `db.m4.large` US$ 0,178/h + 100 GB gp2 (US$ 11,50) · Azure PG Flexible `D2ds_v5` ≈ US$ 0,178/h + 100 GB (US$ 11,50) · Cloud SQL Enterprise: 2 × US$ 0,0413 + 8 × US$ 0,007 por hora (US$ 101,18) + 100 GB SSD a US$ 0,17 (US$ 17,00) |
 | 10M req serverless | US$ 1,80 | US$ 1,80 | US$ 3,20 | Lambda e Azure Functions (Consumption): US$ 0,20/M após 1M grátis · Cloud Run functions: US$ 0,40/M após 2M grátis |
 | **Total mensal** | **US$ 294,90** | **≈ US$ 292,40** | **US$ 229,22** | |
 | **Total anual** | **US$ 3.538,80** | **≈ US$ 3.508,80** | **US$ 2.750,64** | |
 
 **a) Qual ficou mais barato? A diferença é significativa?**
-O **GCP** ficou mais barato: ≈ 22% abaixo de AWS e Azure (≈ US$ 790/ano). AWS e Azure praticamente empatam (diferença < 1%). Mas a vantagem do GCP vem quase toda da VM: o `e2-standard-2` é da família E2 (custo otimizado, CPU compartilhada pelo hipervisor), não um equivalente exato de `m6i.large` / `D2s_v5`. Com o equivalente de CPU dedicada `n2-standard-2` (US$ 0,0971/h → US$ 141,80 pelas 2 VMs), o total do GCP vai a ≈ US$ 273/mês, só ≈ 7% abaixo. **Conclusão:** em preço de lista, os três ficam na mesma ordem de grandeza. Escolher a família de instância muda mais o custo do que escolher o provedor.
+O **GCP** ficou mais barato: ≈ 22% abaixo de AWS e Azure (≈ US$ 790/ano). AWS e Azure praticamente empatam (diferença < 1%). Mas a vantagem do GCP vem quase toda da VM: o `e2-standard-2` é da família E2 (custo otimizado, CPU compartilhada pelo hipervisor), não um equivalente exato de `t3.large` / `D2s_v5`. Com o equivalente de CPU dedicada `n2-standard-2` (US$ 0,0971/h → US$ 141,80 pelas 2 VMs), o total do GCP vai a ≈ US$ 273/mês, só ≈ 7% abaixo. **Conclusão:** em preço de lista, os três ficam na mesma ordem de grandeza. Escolher a família de instância muda mais o custo do que escolher o provedor.
 
 **b) Reserved Instances de 1 ano no mais caro (AWS)**
-- EC2 `m6i.large` RI 1 ano sem entrada: ≈ US$ 0,067/h → 2 × US$ 48,91 = **US$ 97,82** (antes US$ 140,16)
+- EC2 `t3.large` RI 1 ano sem entrada: ≈ US$ 0,067/h → 2 × US$ 48,91 = **US$ 97,82** (antes US$ 140,16)
 - RDS `db.m5.large` RI 1 ano: ≈ **US$ 78/mês** + storage US$ 11,50 = **US$ 89,50** (antes US$ 141,44)
 - Novo total AWS: 97,82 + 11,50 + 89,50 + 1,80 = **≈ US$ 200,62/mês (≈ US$ 2.407/ano)**, cerca de **32% menos**.
 
@@ -143,7 +143,7 @@ O **GCP** ficou mais barato: ≈ 22% abaixo de AWS e Azure (≈ US$ 790/ano). AW
 5. **Serviços gerenciados de RAG/agentes, observabilidade de LLM e guardrails** prontos, que reduzem o código próprio.
 6. **Competência do time, ecossistema, suporte e risco de lock-in.**
 
-*Fontes de preço (consultadas em 12/11/2026):* AWS m6i.large ([Holori](https://calculator.holori.com/aws/ec2/m6i.large/us-east-1), [DevZero](https://www.devzero.io/instances/aws/m6i.large)); Azure D2s_v5 ([CloudOptimo](https://costcalc.cloudoptimo.com/azure-pricing-calculator/vm/Standard-D2s-v5)); GCP e2-standard-2 ([cloudprice.net](https://cloudprice.net/gcp/compute/instances/e2-standard-2)) e n2-standard-2 ([DevZero](https://www.devzero.io/instances/gcp/n2-standard-2)); RDS db.m5.large ([Holori RDS](https://calculator.holori.com/aws/rds), [Bytebase](https://www.bytebase.com/dbcost/rds/instance/db.m5.large.md)); Azure PG D2ds_v5 ([Bytebase](https://www.bytebase.com/dbcost/azure-flexible/compare/2-vcpu.md)); Cloud SQL ([Google Cloud](https://cloud.google.com/sql/pricing?hl=hr)). Storage e serverless: tabelas de preço oficiais de cada provedor, **a confirmar na calculadora**.
+*Fontes de preço (consultadas em 12/11/2026):* AWS t3.large ([Holori](https://calculator.holori.com/aws/ec2/t3.large/us-east-1), [DevZero](https://www.devzero.io/instances/aws/t3.large)); Azure D2s_v5 ([CloudOptimo](https://costcalc.cloudoptimo.com/azure-pricing-calculator/vm/Standard-D2s-v5)); GCP e2-standard-2 ([cloudprice.net](https://cloudprice.net/gcp/compute/instances/e2-standard-2)) e n2-standard-2 ([DevZero](https://www.devzero.io/instances/gcp/n2-standard-2)); RDS db.m5.large ([Holori RDS](https://calculator.holori.com/aws/rds), [Bytebase](https://www.bytebase.com/dbcost/rds/instance/db.m5.large.md)); Azure PG D2ds_v5 ([Bytebase](https://www.bytebase.com/dbcost/azure-flexible/compare/2-vcpu.md)); Cloud SQL ([Google Cloud](https://cloud.google.com/sql/pricing?hl=hr)). Storage e serverless: tabelas de preço oficiais de cada provedor, **a confirmar na calculadora**.
 
 ### 2.3 — Estratégia de migração (workload genérico)
 
