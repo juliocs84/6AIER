@@ -1,0 +1,17 @@
+aula01-cfn $ aws cloudformation describe-stacks --stack-name aula01-grupo --query "Stacks[0].Outputs" --output table
+------------------------------------------------------------------------------------------------------------------------------------------
+|                                                             DescribeStacks                                                             |
++-----------------------------------------------------------------------+------------------+---------------------------------------------+
+|                              Description                              |    OutputKey     |                 OutputValue                 |
++-----------------------------------------------------------------------+------------------+---------------------------------------------+
+|                                                                       |  SshLiberadoPara |  100.58.171.82/32                           |
+|                                                                       |  InstanceId      |  i-0d639bef353b983de                        |
+|                                                                       |  PublicIp        |  54.87.31.174                               |
+|  Conexao a partir do CloudShell (baixe o labsuser.pem do Learner Lab) |  SshCommand      |  ssh -i ~/labsuser.pem ubuntu@54.87.31.174  |
+|                                                                       |  SgAppId         |  sg-084965a0304cb3da8                       |
+|                                                                       |  SgWebId         |  sg-05823fd69a13cbc02                       |
++-----------------------------------------------------------------------+------------------+---------------------------------------------+
+aula01-cfn $ wc -l ~/aula01-tf/main.tf ~/aula01-cfn/template.yaml
+ 176 /home/cloudshell-user/aula01-tf/main.tf
+ 106 /home/cloudshell-user/aula01-cfn/template.yaml
+ 282 total

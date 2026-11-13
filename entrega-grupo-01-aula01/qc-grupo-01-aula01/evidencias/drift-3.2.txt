@@ -1,0 +1,16 @@
+---------------------------------
+|  DescribeStackResourceDrifts  |
++-------------------+-----------+
+|      Recurso      |  Status   |
++-------------------+-----------+
+|  AppSecurityGroup |  IN_SYNC  |
+|  Vm               |  DELETED  |
+|  WebSecurityGroup |  IN_SYNC  |
++-------------------+-----------+
+-----------------------------------------------
+|      DescribeStackDriftDetectionStatus      |
++---------+------------+----------------------+
+|  Drift  | Recursos   |       Status         |
++---------+------------+----------------------+
+|  DRIFTED|  1         |  DETECTION_COMPLETE  |
++---------+------------+----------------------+

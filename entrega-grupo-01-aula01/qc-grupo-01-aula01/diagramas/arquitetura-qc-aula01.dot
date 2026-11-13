@@ -1,0 +1,34 @@
+digraph QC {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=20, label="Quantum Commerce — arquitetura de alto nível (Aula 1, esboço v1) · provedor principal: AWS", labelloc=t, pad=0.4, nodesep=0.35, ranksep=0.7, compound=true];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#FFFFFF", color="#5A6270"];
+  edge  [color="#5A6270", fontname="Helvetica", fontsize=10];
+
+  user [label="Clientes\n12 países\n(web · app · chat)", shape=oval, fillcolor="#EEF1F5"];
+
+  subgraph cluster_edge { label="1. Borda / Frontend"; style="rounded,filled"; fillcolor="#E8F1FB"; color="#9DB8DA";
+    r53 [label="Route 53\n(DNS geo)"]; cf [label="CloudFront + WAF\n(CDN, front estático)"]; cog [label="Cognito\n(identidade cliente)"];
+  }
+  subgraph cluster_api { label="2. API / Aplicação"; style="rounded,filled"; fillcolor="#EAF6EC"; color="#9CCBA4";
+    apigw [label="API Gateway"]; ecs [label="ECS Fargate\n(catálogo, carrinho,\npedidos)"]; lam [label="Lambda\n(funções event-driven)"];
+  }
+  subgraph cluster_ai { label="3. IA conversacional (agentic)"; style="rounded,filled"; fillcolor="#F3ECFA"; color="#C2A8DE";
+    agent [label="Orquestrador de agentes\n(Bedrock Agents / ECS)"]; bed [label="Amazon Bedrock\n(LLMs + Guardrails)"]; kb [label="Knowledge Base\n(RAG sobre 5M SKUs)"];
+  }
+  subgraph cluster_data { label="4. Dados"; style="rounded,filled"; fillcolor="#FDF3E3"; color="#E3C38E";
+    s3 [label="S3\n(catálogo, imagens,\ndata lake)"]; rds [label="Aurora PostgreSQL\n(pedidos, clientes)"]; ddb [label="DynamoDB\n(carrinho, sessão,\nhistórico de chat)"]; vec [label="OpenSearch Serverless\n(vector store)"];
+  }
+  subgraph cluster_int { label="5. Integração"; style="rounded,filled"; fillcolor="#EEF1F5"; color="#AEB6C2";
+    eb [label="EventBridge"]; sqs [label="SQS / SNS"];
+  }
+  subgraph cluster_obs { label="6. Observabilidade · Segurança · FinOps (transversal)"; style="rounded,filled"; fillcolor="#FBEAEA"; color="#DDA3A3";
+    cw [label="CloudWatch + X-Ray\n(logs, métricas, traces)"]; iam [label="IAM · KMS · Secrets Manager"]; ce [label="Cost Explorer + tags\n(default_tags no IaC)"];
+  }
+
+  user -> r53 -> cf;
+  cf -> apigw; user -> cog [style=dashed]; cog -> apigw [style=dashed, label="JWT"];
+  apigw -> ecs; apigw -> agent [label="chat"];
+  ecs -> rds; ecs -> ddb; ecs -> s3; ecs -> eb;
+  agent -> bed; agent -> kb; kb -> vec; kb -> s3 [label="ingestão"]; agent -> ecs [label="tools\n(busca, pedido)"]; agent -> ddb [label="memória"];
+  eb -> sqs -> lam; lam -> s3; lam -> vec [label="reindexa\nembeddings"];
+  ecs -> cw [style=dotted]; agent -> cw [style=dotted]; lam -> cw [style=dotted];
+}

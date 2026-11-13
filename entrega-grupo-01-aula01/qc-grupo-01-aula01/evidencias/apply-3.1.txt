@@ -1,0 +1,22 @@
+aula01-tf $ cp ~/qc-grupo-01-aula01/terraform/{main.tf,variables.tf,outputs.tf} .
+aula01-tf $ export MEU_IP=$(curl -s https://checkip.amazonaws.com)
+aula01-tf $ terraform apply -no-color -var="meu_ip=${MEU_IP}" -auto-approve | tail -15
+aws_vpc_security_group_ingress_rule.app_8080_from_web: Creation complete after 0s [id=sgr-05659471727732987]
+aws_vpc_security_group_egress_rule.app_all_out: Creation complete after 0s [id=sgr-0af212424243d0908]
+
+Apply complete! Resources: 3 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+instance_id = "i-0beb05d348fb3a022"
+public_ip_address = "100.25.213.150"
+resource_group_name = "rg-iac-aula01"
+sg_app_id = "sg-0345a3a5ea8de0264"
+sg_web_id = "sg-0fc8816b382c14853"
+ssh_command = "ssh -i ~/.ssh/id_rsa ubuntu@100.25.213.150"
+ssh_liberado_para = "44.201.89.248/32"
+vm_name = "vm-lab-aula01"
+aula01-tf $ terraform destroy -var="meu_ip=${MEU_IP}" -auto-approve | tail -3
+
+
+Destroy complete! Resources: 7 destroyed.

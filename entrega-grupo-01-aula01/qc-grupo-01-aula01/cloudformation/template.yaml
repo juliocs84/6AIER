@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Aula 1 - Ex. 3.2. Mesma VM do lab/terraform (SG + EC2 Ubuntu 24.04 + tags),
+  com o endurecimento do Ex. 3.1: SSH restrito ao parametro SshCidr e sg-app
+  aceitando 8080 somente a partir do SG da VM.
+
+Parameters:
+  VmName:
+    Type: String
+    Default: vm-lab-aula01-cfn
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues: [t3.nano, t3.micro, t3.small, t3.medium]
+  KeyName:
+    Description: Key pair existente (no Learner Lab a vockey ja existe)
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: vockey
+  SshCidr:
+    Description: Seu IP publico em /32 - ex. "$(curl -s https://checkip.amazonaws.com)/32"
+    Type: String
+    # sem default: o deploy falha se ninguem informar o IP (fail-closed)
+    AllowedPattern: '^(\d{1,3}\.){3}\d{1,3}/32$'
+    ConstraintDescription: Informe um unico IPv4 em /32 (nunca 0.0.0.0/0).
+  StackTag:
+    Type: String
+    Default: iac-aula01-cfn
+  UbuntuAmi:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id
+
+Resources:
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub "${VmName}-sg"
+      GroupDescription: SSH restrito, HTTP e HTTPS para a VM do lab da Aula 1
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 22, ToPort: 22, CidrIp: !Ref SshCidr, Description: SSH somente do IP do operador }
+        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0, Description: HTTP }
+        - { IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0, Description: HTTPS }
+      Tags:
+        - { Key: aula, Value: "1" }
+        - { Key: disciplina, Value: cloud-cognitive }
+        - { Key: projeto, Value: quantum-commerce }
+        - { Key: provisionado, Value: cloudformation }
+        - { Key: stack, Value: !Ref StackTag }
+
+  AppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub "${VmName}-app-sg"
+      GroupDescription: Camada de aplicacao QC - 8080 somente a partir do SG da VM
+      Tags:
+        - { Key: Name, Value: sg-app }
+        - { Key: aula, Value: "1" }
+        - { Key: disciplina, Value: cloud-cognitive }
+        - { Key: projeto, Value: quantum-commerce }
+        - { Key: provisionado, Value: cloudformation }
+        - { Key: stack, Value: !Ref StackTag }
+
+  # Regra separada (e nao inline) para referenciar o outro SG sem dependencia circular
+  AppIngressFromWeb:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt AppSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 8080
+      ToPort: 8080
+      SourceSecurityGroupId: !GetAtt WebSecurityGroup.GroupId
+      Description: 8080 somente a partir do SG da VM
+
+  Vm:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref UbuntuAmi
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroupIds: [!GetAtt WebSecurityGroup.GroupId]
+      MetadataOptions:
+        HttpTokens: required
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs: { VolumeType: gp3, VolumeSize: 8, Encrypted: true }
+      Tags:
+        - { Key: Name, Value: !Ref VmName }
+        - { Key: aula, Value: "1" }
+        - { Key: disciplina, Value: cloud-cognitive }
+        - { Key: projeto, Value: quantum-commerce }
+        - { Key: provisionado, Value: cloudformation }
+        - { Key: stack, Value: !Ref StackTag }
+
+Outputs:
+  InstanceId:
+    Value: !Ref Vm
+  PublicIp:
+    Value: !GetAtt Vm.PublicIp
+  SgWebId:
+    Value: !GetAtt WebSecurityGroup.GroupId
+  SgAppId:
+    Value: !GetAtt AppSecurityGroup.GroupId
+  SshLiberadoPara:
+    Value: !Ref SshCidr
+  SshCommand:
+    Description: Conexao a partir do CloudShell (baixe o labsuser.pem do Learner Lab)
+    Value: !Sub "ssh -i ~/labsuser.pem ubuntu@${Vm.PublicIp}"

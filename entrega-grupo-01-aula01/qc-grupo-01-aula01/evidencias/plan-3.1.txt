@@ -1,0 +1,129 @@
+aws_resourcegroups_group.lab: Refreshing state... [id=rg-iac-aula01]
+data.aws_ami.ubuntu: Reading...
+data.aws_vpc.padrao: Reading...
+aws_key_pair.lab: Refreshing state... [id=key-vm-lab-aula01]
+data.aws_ami.ubuntu: Read complete after 0s [id=ami-08b275ac6cc5dbefb]
+data.aws_vpc.padrao: Read complete after 0s [id=vpc-0021205d1fb56cd1e]
+aws_security_group.web: Refreshing state... [id=sg-078eea4520c77d45d]
+aws_instance.vm: Refreshing state... [id=i-0cc0ef38d77d09dcb]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # aws_security_group.app will be created
+  + resource "aws_security_group" "app" {
+      + arn                    = (known after apply)
+      + description            = "Camada de aplicacao QC - 8080 somente a partir do SG da VM"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = "vm-lab-aula01-app-sg"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "sg-app"
+        }
+      + tags_all               = {
+          + "Name"         = "sg-app"
+          + "aula"         = "1"
+          + "disciplina"   = "cloud-cognitive"
+          + "projeto"      = "quantum-commerce"
+          + "provisionado" = "terraform"
+          + "stack"        = "iac-aula01"
+        }
+      + vpc_id                 = "vpc-0021205d1fb56cd1e"
+    }
+
+  # aws_security_group.web will be updated in-place
+  ~ resource "aws_security_group" "web" {
+        id                     = "sg-078eea4520c77d45d"
+      ~ ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - description      = "SSH"
+              - from_port        = 22
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 22
+            },
+          + {
+              + cidr_blocks      = [
+                  + "100.58.171.82/32",
+                ]
+              + description      = "SSH"
+              + from_port        = 22
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 22
+            },
+            # (2 unchanged elements hidden)
+        ]
+        name                   = "vm-lab-aula01-sg"
+        tags                   = {}
+        # (8 unchanged attributes hidden)
+    }
+
+  # aws_vpc_security_group_egress_rule.app_all_out will be created
+  + resource "aws_vpc_security_group_egress_rule" "app_all_out" {
+      + arn                    = (known after apply)
+      + cidr_ipv4              = "0.0.0.0/0"
+      + description            = "Saida liberada"
+      + id                     = (known after apply)
+      + ip_protocol            = "-1"
+      + security_group_id      = (known after apply)
+      + security_group_rule_id = (known after apply)
+      + tags_all               = {
+          + "aula"         = "1"
+          + "disciplina"   = "cloud-cognitive"
+          + "projeto"      = "quantum-commerce"
+          + "provisionado" = "terraform"
+          + "stack"        = "iac-aula01"
+        }
+    }
+
+  # aws_vpc_security_group_ingress_rule.app_8080_from_web will be created
+  + resource "aws_vpc_security_group_ingress_rule" "app_8080_from_web" {
+      + arn                          = (known after apply)
+      + description                  = "8080 somente a partir do SG da VM"
+      + from_port                    = 8080
+      + id                           = (known after apply)
+      + ip_protocol                  = "tcp"
+      + referenced_security_group_id = "sg-078eea4520c77d45d"
+      + security_group_id            = (known after apply)
+      + security_group_rule_id       = (known after apply)
+      + tags_all                     = {
+          + "aula"         = "1"
+          + "disciplina"   = "cloud-cognitive"
+          + "projeto"      = "quantum-commerce"
+          + "provisionado" = "terraform"
+          + "stack"        = "iac-aula01"
+        }
+      + to_port                      = 8080
+    }
+
+Plan: 3 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  + sg_app_id           = (known after apply)
+  + sg_web_id           = "sg-078eea4520c77d45d"
+  + ssh_liberado_para   = "100.58.171.82/32"
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
