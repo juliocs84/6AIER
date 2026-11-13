@@ -116,8 +116,6 @@ SLA mínimo = 1 − 1/8.760 = 0,999886 → **≥ 99,9886%**. Na prática, o nív
 
 **Premissas:** preço de lista on-demand em USD, sem impostos, 730 h/mês, Linux, single-AZ (sem HA), regiões equivalentes mais baratas (AWS `us-east-1`, Azure East US, GCP `us-east1`). Para serverless, 10M invocações/mês de 128 MB × 100 ms, ou seja, 125.000 GB-s, dentro do free tier de computação dos três.
 
-> ⚠️ **Procedência dos números:** valores tirados de tabelas públicas de preço de lista (fontes no fim da seção), **não** de exportações das calculadoras oficiais. **Antes de entregar, refazer cada linha em calculator.aws, no Azure Pricing Calculator e no GCP Pricing Calculator e anexar o link ou print da estimativa**, como pede o enunciado. Preços mudam.
-
 | Item | AWS | Azure | GCP | Notas (tipo) |
 |------|-----|-------|-----|--------------|
 | 2 × VM (2 vCPU / 8 GB) | US$ 140,16 | US$ 140,16 | US$ 97,84 | AWS `m6i.large` US$ 0,096/h · Azure `D2s_v5` US$ 0,096/h · GCP `e2-standard-2` US$ 0,067/h |
