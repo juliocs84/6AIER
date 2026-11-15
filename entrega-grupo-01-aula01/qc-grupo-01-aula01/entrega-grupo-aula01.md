@@ -9,7 +9,7 @@
 | # | Nome completo | GitHub | E-mail FIAP |
 |---|---------------|--------|-------------|
 | 1 | Julio Cesar da Silva | [@juliocs84](https://github.com/juliocs84) | rm379254@fiap.com.br |
-| 2 | Eduardo Oliveira Santos Cunha | — | rm379314@fiap.com.br |
+| 2 | Eduardo Oliveira Santos Cunha | [@educunhamxk](https://github.com/educunhamxk)| rm379314@fiap.com.br |
 
 ## Distribuição do trabalho
 
