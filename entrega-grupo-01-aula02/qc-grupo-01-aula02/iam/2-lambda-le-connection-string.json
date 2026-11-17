@@ -1,0 +1,14 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LerSoAConnectionStringDoPostgres",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:qc-aula02-*/postgres-??????",
+      "Condition": {
+        "StringEquals": { "secretsmanager:VersionStage": "AWSCURRENT" }
+      }
+    }
+  ]
+}

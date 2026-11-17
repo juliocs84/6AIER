@@ -1,0 +1,3 @@
+qc lake compara (Lab 1B) — pergunta: faturamento por categoria em setembro de 2026
+  raw/ (CSV)          leu   12.63 MB
+  curated/ (Parquet)  leu    23.2 KB   (557x menos)

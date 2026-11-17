@@ -1,0 +1,27 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InventarioDeSegredos",
+      "Effect": "Allow",
+      "Action": "secretsmanager:ListSecrets",
+      "Resource": "*"
+    },
+    {
+      "Sid": "MetadadosSemValor",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:ListSecretVersionIds",
+        "secretsmanager:GetResourcePolicy"
+      ],
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:qc-aula02-*"
+    },
+    {
+      "Sid": "NegarLeituraDoValorMesmoQueOutraPoliticaPermita",
+      "Effect": "Deny",
+      "Action": ["secretsmanager:GetSecretValue", "secretsmanager:BatchGetSecretValue"],
+      "Resource": "*"
+    }
+  ]
+}

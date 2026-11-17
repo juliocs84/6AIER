@@ -1,0 +1,32 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CriarSoComTagDoProjeto",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:CreateSecret", "secretsmanager:TagResource"],
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:qc-aula02-*",
+      "Condition": {
+        "StringEquals": { "aws:RequestTag/projeto": "quantum-commerce" }
+      }
+    },
+    {
+      "Sid": "AtualizarERotacionar",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:RotateSecret",
+        "secretsmanager:CancelRotateSecret",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:qc-aula02-*"
+    },
+    {
+      "Sid": "SenhaAleatoria",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetRandomPassword",
+      "Resource": "*"
+    }
+  ]
+}

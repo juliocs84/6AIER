@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "GerenciarSegredosDoLab",
+      "Effect": "Allow",
+      "Action": "secretsmanager:*",
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:qc-aula02-*"
+    },
+    {
+      "Sid": "AcoesSemSuporteARecurso",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:ListSecrets", "secretsmanager:GetRandomPassword"],
+      "Resource": "*"
+    }
+  ]
+}

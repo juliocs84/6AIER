@@ -1,0 +1,33 @@
+digraph QC2 {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=20, label="Quantum Commerce — camada de dados (Aula 2, v2) · região principal us-east-1 (residência de dados: ver Ex. 2.2e)", labelloc=t, pad=0.4, nodesep=0.3, ranksep=0.8, compound=true];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#FFFFFF", color="#5A6270"];
+  edge  [color="#5A6270", fontname="Helvetica", fontsize=9];
+
+  subgraph cluster_cons { label="Quem consome"; style="rounded,filled"; fillcolor="#EEF1F5"; color="#AEB6C2";
+    front [label="Frontend / app\n(API Gateway + ECS)"]; agente [label="Agentes de IA\n(busca, atendimento)"]; analista [label="Analistas / BI\n(Athena, QuickSight)"]; ml [label="Time de ML\n(treino e serving)"];
+  }
+  subgraph cluster_sec { label="Credenciais (Secrets Manager + IAM)"; style="rounded,filled"; fillcolor="#FBEAEA"; color="#DDA3A3";
+    sm [label="Secrets Manager\nconnection strings\n(rotação automática)"]; roles [label="IAM roles por consumidor\n(menor privilégio, sem chave no código)"];
+  }
+  subgraph cluster_tx { label="Transacional (consistência forte)"; style="rounded,filled"; fillcolor="#EAF6EC"; color="#9CCBA4";
+    aur_tx [label="Aurora PostgreSQL\nClientes (50M) + Pedidos (10M/mês)\nr6g.xlarge writer + reader, Multi-AZ"]; aur_cat [label="Aurora PostgreSQL — Catálogo\nProdutos (5M SKUs)\n+ pgvector (embeddings)"];
+  }
+  subgraph cluster_kv { label="Chave-valor (latência baixa, expira)"; style="rounded,filled"; fillcolor="#FDF3E3"; color="#E3C38E";
+    ddb_cart [label="DynamoDB on-demand\nCarrinhos (500k)\nTTL 24 h"]; ddb_rev [label="DynamoDB on-demand\nReviews (30M)\nPK produto_id · GSI por_cliente"]; cache [label="ElastiCache Serverless (Valkey)\nSessões (1M) · TTL 30 min"];
+  }
+  subgraph cluster_busca { label="Busca"; style="rounded,filled"; fillcolor="#F3ECFA"; color="#C2A8DE";
+    os [label="OpenSearch Serverless\nbusca híbrida (BM25 + k-NN)\nfacetas, sinônimos, 5M SKUs"];
+  }
+  subgraph cluster_lake { label="Data lake S3 (camadas)"; style="rounded,filled"; fillcolor="#E8F1FB"; color="#9DB8DA";
+    fh [label="Data Firehose\n(JSON → Parquet)"]; raw [label="s3://…/raw/\nclickstream, CDC, logs"]; cur [label="s3://…/curated/\nParquet particionado\n(ano/mês/dia)"]; img [label="s3://…/imagens/\n50 TB + CloudFront"]; models [label="s3://…/modelos/\nversionado + Model Registry"]; arch [label="logs-compras/ → Deep Archive\n(5 anos, LGPD)"]; glue [label="Glue Catalog + Athena"];
+  }
+
+  front -> aur_tx [label="pedido / perfil"]; front -> ddb_cart; front -> cache [label="sessão"]; front -> img [label="via CDN"];
+  agente -> os [label="busca"]; agente -> ddb_rev [label="Query por produto"]; agente -> aur_cat [label="preço / estoque"];
+  aur_cat -> os [label="CDC → reindexa", style=dashed];
+  front -> fh [label="eventos de navegação"]; fh -> raw; raw -> cur [label="ETL / CTAS"]; cur -> glue; analista -> glue;
+  aur_tx -> raw [label="DMS CDC", style=dashed]; ddb_rev -> raw [label="export S3", style=dashed];
+  ml -> cur [label="features"]; ml -> models;
+  roles -> sm [style=dotted, label="GetSecretValue\n(só o seu ARN)"]; sm -> aur_tx [style=dotted]; sm -> aur_cat [style=dotted];
+  raw -> arch [style=dotted, label="lifecycle"];
+}
