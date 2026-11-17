@@ -1,0 +1,92 @@
+"""
+Lambda HTTP da Quantum Commerce — versão L₂ (com o filtro preco_max do Lab 2, validado).
+
+Lê catalogo/produtos.csv do bucket S3 desta aula. SEM credenciais no código:
+o boto3 usa a credencial temporária da execution role da função (no Learner
+Lab, a LabRole), entregue pela própria Lambda em variáveis de ambiente.
+
+Variáveis de ambiente (configuradas pelo Terraform):
+    BUCKET_NAME — bucket do catálogo
+    CSV_KEY     — chave do CSV (padrão: catalogo/produtos.csv)
+"""
+import csv
+import json
+import logging
+import os
+
+import boto3  # já vem no runtime Python da Lambda — não precisa empacotar
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+BUCKET = os.environ["BUCKET_NAME"]
+CSV_KEY = os.environ.get("CSV_KEY", "catalogo/produtos.csv")
+
+# Cliente criado FORA do handler: reaproveitado entre invocações "quentes"
+_s3 = boto3.client("s3")
+
+
+def resposta(corpo: dict, status: int = 200) -> dict:
+    return {
+        "statusCode": status,
+        "headers": {"Content-Type": "application/json; charset=utf-8"},
+        "body": json.dumps(corpo, ensure_ascii=False),
+    }
+
+
+def carregar_produtos() -> list[dict]:
+    """Baixa o CSV do S3 e converte em lista de dicts."""
+    obj = _s3.get_object(Bucket=BUCKET, Key=CSV_KEY)
+    rows = list(csv.DictReader(obj["Body"].read().decode("utf-8").splitlines()))
+    for r in rows:
+        r["id"] = int(r["id"])
+        r["preco"] = float(r["preco"])
+        r["estoque"] = int(r["estoque"])
+    return rows
+
+
+def listar_produtos(params: dict) -> dict:
+    """GET /produtos?categoria=moveis&nome=cadeira&preco_max=1500"""
+    logger.info("Endpoint /produtos chamado")
+    try:
+        produtos = carregar_produtos()
+    except Exception as e:  # noqa: BLE001 — devolve o erro em JSON para o lab
+        logger.exception("Falha ao carregar produtos do S3")
+        return resposta({"erro": f"falha ao acessar o S3: {e!s}"}, 500)
+
+    categoria = (params.get("categoria") or "").lower().strip()
+    nome = (params.get("nome") or "").lower().strip()
+
+    # Lab 2: filtro preco_max ("tem cadeira boa pra coluna até R$ 1.500?").
+    # Validado ANTES de usar: o agente pode mandar "abc", "-5" ou "mil reais".
+    # Erro do cliente é 400 com mensagem que o modelo entende, e não 502.
+    preco_max = None
+    bruto = (params.get("preco_max") or "").strip()
+    if bruto:
+        try:
+            preco_max = float(bruto.replace(",", "."))
+        except ValueError:
+            return resposta({"erro": "preco_max deve ser um número em reais, ex.: 1500 ou 1499.90",
+                             "recebido": bruto}, 400)
+        if preco_max <= 0:
+            return resposta({"erro": "preco_max deve ser maior que zero", "recebido": bruto}, 400)
+
+    resultado = produtos
+    if categoria:
+        resultado = [p for p in resultado if p["categoria"].lower() == categoria]
+    if nome:
+        resultado = [p for p in resultado if nome in p["nome"].lower()]
+    if preco_max is not None:
+        resultado = [p for p in resultado if p["preco"] <= preco_max]
+    return resposta({"total": len(resultado), "produtos": resultado})
+
+
+def lambda_handler(event, context):
+    caminho = event.get("rawPath", "/")
+    params = event.get("queryStringParameters") or {}
+
+    if caminho == "/health":
+        return resposta({"status": "ok", "service": "qc-catalogo", "source": "s3"})
+    if caminho in ("/", "/produtos"):
+        return listar_produtos(params)
+    return resposta({"erro": f"rota {caminho} não existe", "rotas": ["/produtos", "/health"]}, 404)

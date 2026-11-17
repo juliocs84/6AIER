@@ -1,0 +1,33 @@
+== 1.3 — Cold start (17/11/2026 22:43:51)
+Chamada 1 (fria):
+HTTP 200  0.895963s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos
+Chamada 2 (5 s depois, quente):
+HTTP 200  0.086804s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos
+Linhas REPORT do CloudWatch (a fria tem 'Init Duration'):
+    REPORT RequestId: 5da9e6be-561a-43c5-a2ad-8a90fcd6b8a4
+    Duration: 194.94 ms
+    Billed Duration: 683 ms
+    Memory Size: 256 MB
+    Max Memory Used: 92 MB
+    Init Duration: 487.36 ms
+    
+    
+    REPORT RequestId: e967aad2-5d3a-4bea-aff9-6e9d91931110
+    Duration: 29.49 ms
+    Billed Duration: 30 ms
+    Memory Size: 256 MB
+    Max Memory Used: 92 MB
+    
+    
+
+Chamada 3: rode 'bash evidencias.sh frio3' daqui a 30 minutos.
+
+Chamada 3 (8 min depois da chamada 2):
+HTTP 200  0.232638s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos
+    REPORT RequestId: 9f2567d2-2e6d-4c3f-ab42-f93afd4c27a8
+    Duration: 180.82 ms
+    Billed Duration: 181 ms
+    Memory Size: 256 MB
+    Max Memory Used: 93 MB
+    
+    

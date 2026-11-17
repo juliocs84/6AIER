@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LerSoOCatalogo",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::qc-aula03-*-catalogo/catalogo/*"
+    },
+    {
+      "Sid": "EscreverOProprioLog",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/qc-aula03-*-catalogo:*"
+    }
+  ]
+}

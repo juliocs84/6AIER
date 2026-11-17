@@ -1,0 +1,9 @@
+== 2.2 — tool de frete (17/11/2026 22:24:51)
+GET /frete?cep_origem=01310100&cep_destino=04538133&peso_kg=2.5
+{"valor_reais": 15.75, "prazo_dias_uteis": 2, "tipo_rota": "local", "origem": {"cep": "01310100", "faixa": "SP capital e Grande SP"}, "destino": {"cep": "04538133", "faixa": "SP capital e Grande SP"}, "peso_informado_kg": 2.5, "peso_cobrado_kg": 2.5, "memoria_de_calculo": "R$ 12.00 + R$ 1.50/kg × 2.5 kg"}
+GET /frete?cep_origem=01310-100&cep_destino=20040-002&peso_kg=2,5
+{"valor_reais": 24.25, "prazo_dias_uteis": 4, "tipo_rota": "regional", "origem": {"cep": "01310100", "faixa": "SP capital e Grande SP"}, "destino": {"cep": "20040002", "faixa": "RJ e ES"}, "peso_informado_kg": 2.5, "peso_cobrado_kg": 2.5, "memoria_de_calculo": "R$ 18.00 + R$ 2.50/kg × 2.5 kg"}
+GET /frete?cep_origem=01310100&cep_destino=90010000&peso_kg=12.2
+{"valor_reais": 75.0, "prazo_dias_uteis": 9, "tipo_rota": "nacional", "origem": {"cep": "01310100", "faixa": "SP capital e Grande SP"}, "destino": {"cep": "90010000", "faixa": "RS"}, "peso_informado_kg": 12.2, "peso_cobrado_kg": 12.5, "memoria_de_calculo": "R$ 25.00 + R$ 4.00/kg × 12.5 kg"}
+GET /frete?cep_origem=123&cep_destino=20040002&peso_kg=abc
+{"erro": "parâmetros inválidos", "detalhes": ["cep_origem deve ter 8 dígitos (ex.: 01310100 ou 01310-100)", "peso_kg deve ser um número em kg (ex.: 2.5)"]}

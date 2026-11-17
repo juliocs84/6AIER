@@ -1,0 +1,29 @@
+== 3.2 — ab -n 1000 -c 50 (17/11/2026 22:47:01)
+LAMBDA (https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=moveis)
+  requisições: 1000
+  falhas: 0
+  throughput (req/s): 499.85
+  latência média (ms): 100.031
+  p50 (ms): 52
+  p95 (ms): 224
+  p99 (ms): 828
+  máx (ms): 888
+
+FARGATE 0,25 vCPU / 0,5 GB (http://98.93.97.77:8080/produtos?categoria=moveis)
+  requisições: 1000
+  falhas: 0
+  throughput (req/s): 37.64
+  latência média (ms): 1328.461
+  p50 (ms): 1248
+  p95 (ms): 2099
+  p99 (ms): 2413
+  máx (ms): 2900
+
+== Lambda durante o teste (Logs Insights + métricas)
+invocacoes       1000
+billed_media_ms  61.419
+p95_ms           110.3491
+frias            49
+memoria_mb       256
+ConcurrentExecutions (máximo no período):
+50.0

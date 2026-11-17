@@ -1,0 +1,75 @@
+terraform $ bash "$E/scripts/evidencias.sh" logs
+== 2.2 — tool de frete (17/11/2026 22:44:17)
+GET /frete?cep_origem=01310100&cep_destino=04538133&peso_kg=2.5
+{"valor_reais": 15.75, "prazo_dias_uteis": 2, "tipo_rota": "local", "origem": {"cep": "01310100", "faixa": "SP capital e Grande SP"}, "destino": {"cep": "04538133", "faixa": "SP capital e Grande SP"}, "peso_informado_kg": 2.5, "peso_cobrado_kg": 2.5, "memoria_de_calculo": "R$ 12.00 + R$ 1.50/kg × 2.5 kg"}
+GET /frete?cep_origem=01310-100&cep_destino=20040-002&peso_kg=2,5
+{"valor_reais": 24.25, "prazo_dias_uteis": 4, "tipo_rota": "regional", "origem": {"cep": "01310100", "faixa": "SP capital e Grande SP"}, "destino": {"cep": "20040002", "faixa": "RJ e ES"}, "peso_informado_kg": 2.5, "peso_cobrado_kg": 2.5, "memoria_de_calculo": "R$ 18.00 + R$ 2.50/kg × 2.5 kg"}
+GET /frete?cep_origem=01310100&cep_destino=90010000&peso_kg=12.2
+{"valor_reais": 75.0, "prazo_dias_uteis": 9, "tipo_rota": "nacional", "origem": {"cep": "01310100", "faixa": "SP capital e Grande SP"}, "destino": {"cep": "90010000", "faixa": "RS"}, "peso_informado_kg": 12.2, "peso_cobrado_kg": 12.5, "memoria_de_calculo": "R$ 25.00 + R$ 4.00/kg × 12.5 kg"}
+GET /frete?cep_origem=123&cep_destino=20040002&peso_kg=abc
+{"erro": "parâmetros inválidos", "detalhes": ["cep_origem deve ter 8 dígitos (ex.: 01310100 ou 01310-100)", "peso_kg deve ser um número em kg (ex.: 2.5)"]}
+
+== 2.3a — 20 chamadas variadas ao catálogo (inclui 404 e 400)
+
+HTTP 200  0.736948s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos
+HTTP 200  0.066321s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=moveis
+HTTP 200  0.077331s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=moveis&preco_max=1500
+HTTP 200  0.062158s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?nome=cadeira
+HTTP 200  0.068340s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=eletronicos&preco_max=2000
+HTTP 400  0.059920s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?preco_max=abc
+HTTP 200  0.033488s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/health
+HTTP 200  0.066304s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=calcados
+HTTP 404  0.040118s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/nao-existe
+HTTP 200  0.063271s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=vestuario
+HTTP 200  0.066763s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?nome=tenis
+HTTP 404  0.034084s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/carrinho
+HTTP 200  0.065049s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?preco_max=500
+HTTP 200  0.038075s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/health
+HTTP 200  0.070618s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=eletrodomesticos
+HTTP 200  0.059014s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?nome=dell
+HTTP 404  0.042944s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/admin
+HTTP 200  0.052040s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?categoria=moveis&nome=gamer
+HTTP 400  0.067206s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?preco_max=0
+HTTP 200  0.069241s  https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos
+
+Aguardando 60 s para os logs chegarem ao Logs Insights...
+== Logs Insights em /aws/lambda/qc-aula03-jwd67j-catalogo (desde o início desta etapa)
+chamadas    20
+media_ms    30.236
+p95_ms      38.78
+memoria_mb  92
+frias       1
+
+== Métricas (últimos 30 min, período 30 min) — complemento ao print do console
+Invocations:
+{
+    "Timestamp": "2026-11-17T22:15:00+00:00",
+    "Sum": 24.0,
+    "Unit": "Count"
+}
+Errors:
+{
+    "Timestamp": "2026-11-17T22:15:00+00:00",
+    "Sum": 0.0,
+    "Unit": "Count"
+}
+Duration:
+{
+    "Timestamp": "2026-11-17T22:15:00+00:00",
+    "Average": 41.13625,
+    "Maximum": 194.94,
+    "Unit": "Milliseconds"
+}
+
+== Alarmes (2.3c)
+-------------------------------------------------------------------
+|                         DescribeAlarms                          |
++----------------------------------+-----+---------+------+-------+
+|  qc-aula03-jwd67j-catalogo-erros |  OK |  Errors |  1.0 |  300  |
++----------------------------------+-----+---------+------+-------+
+----------------------------------------------------------------
+|                        DescribeAlarms                        |
++-------------------------------+-----+---------+------+-------+
+|  qc-aula03-jwd67j-frete-erros |  OK |  Errors |  1.0 |  300  |
++-------------------------------+-----+---------+------+-------+
+→ Agora tire o print: Lambda → qc-aula03-jwd67j-catalogo → Monitor (Invocations, Duration, Errors).

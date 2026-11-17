@@ -1,0 +1,24 @@
+== 3.3b — drift (17/11/2026 22:27:49)
+Mudando a memória de qc-aula03-sbs2ks-catalogo para 512 MB FORA do Terraform (o mesmo que o console faz)...
+512
+
+terraform plan (trecho):
+Terraform will perform the following actions:
+
+  # aws_lambda_function.catalogo will be updated in-place
+  ~ resource "aws_lambda_function" "catalogo" {
+        id                             = "qc-aula03-sbs2ks-catalogo"
+      ~ memory_size                    = 512 -> 256
+        tags                           = {}
+        # (28 unchanged attributes hidden)
+
+        # (4 unchanged blocks hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+terraform apply (restaura o que está no código):
+aws_lambda_function.catalogo: Modifying... [id=qc-aula03-sbs2ks-catalogo]
+aws_lambda_function.catalogo: Modifications complete after 6s [id=qc-aula03-sbs2ks-catalogo]
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+Memória agora: 256 MB

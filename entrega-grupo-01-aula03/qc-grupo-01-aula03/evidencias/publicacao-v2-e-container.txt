@@ -1,0 +1,40 @@
+terraform $ qc publica v2
+→ Publicando function/v2-s3 em qc-aula03-jwd67j-catalogo
+✓ v2-s3 publicada. Teste com: qc chama /produtos
+  Console: Lambda → qc-aula03-jwd67j-catalogo → Code (o código que acabou de subir)
+terraform $ qc chama /health
+{
+  "status": "ok",
+  "service": "qc-catalogo",
+  "source": "s3"
+}
+
+HTTP 200 em 0.689045s · https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/health
+Abra no navegador e no celular: https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/
+A 1ª chamada depois de publicar é mais lenta (cold start): veja o Init Duration no CloudWatch.
+terraform $ qc chama "/produtos?preco_max=abc"
+{
+  "erro": "preco_max deve ser um número em reais, ex.: 1500 ou 1499.90",
+  "recebido": "abc"
+}
+
+HTTP 400 em 0.214140s · https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/produtos?preco_max=abc
+Abra no navegador e no celular: https://yzi2b23y4k3otjvfortdvy4kni0swbpx.lambda-url.us-east-1.on.aws/
+A 1ª chamada depois de publicar é mais lenta (cold start): veja o Init Duration no CloudWatch.
+terraform $ qc container
+→ 1/4 Build da imagem no CloudShell (006253939753.dkr.ecr.us-east-1.amazonaws.com/produtos-api:v1)
+curl -s -m 10 "$QC_CONTAINER_URL/health"; echosha256:f2734f108689538d296a79120eaf8b3d5a0204178c0a5625013d0b271037bb4b
+→ 2/4 Login no ECR (credencial da sessão, sem senha)
+WARNING! Your password will be stored unencrypted in /home/cloudshell-user/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+→ 3/4 Push para o ECR
+006253939753.dkr.ecr.us-east-1.amazonaws.com/produtos-api:v1
+→ 4/4 terraform apply com o serviço no Fargate (1 a 3 min)
+→ Aguardando a tarefa ganhar IP público (até 5 min)
+✓ Container no ar: http://98.93.97.77:8080/produtos
+  Console: ECR → produtos-api (a imagem e o tamanho) · ECS → qc-aula03-jwd67j-cluster → Tasks
+  Agora: qc compara "/produtos?categoria=moveis&preco_max=1500"
+terraform $ curl -s -m 10 "$QC_CONTAINER_URL/health"; echo
+{"status":"ok","service":"qc-catalogo","source":"s3","runtime":"container"}
