@@ -341,7 +341,7 @@ Scan do DynamoDB: leu os **20 itens** da tabela para devolver 3, e consumiu **2,
   - o histórico é lido em lote para treino e backtest, e cabe em **S3 Parquet particionado por ativo/ano**;
   - o sinal recente é lido por chave pela API, e cabe em **DynamoDB com TTL**;
   - a chave de API da exchange, hoje na configuração do backend, deveria ir para o **Secrets Manager**. É exatamente o ponto central desta reflexão.
-- **Eduardo** *(exemplo ilustrativo, a substituir por um dado real do trabalho)*: chamados de suporte de um sistema interno, com relatórios de SLA rodando direto no banco operacional. Pelo canvas, a operação fica no RDS com a senha no Secrets Manager, e o histórico vai para S3 + Athena, para que os relatórios não compitam com o atendimento.
+- **Eduardo:** chamados de suporte de um sistema interno (~5 mil por mês). Hoje os relatórios de SLA rodam direto no banco operacional do sistema, e a senha do banco fica no arquivo de configuração da aplicação. Aplicando o canvas, ficou claro que são duas perguntas diferentes sobre o mesmo dado: "quais chamados estão abertos agora?" pode atrasar alguns minutos e é lida por chave, enquanto "qual foi o tempo médio de resolução por equipe no mês?" vira meta e não pode errar, mas é lida em lote. A decisão: a operação fica no **RDS PostgreSQL**, com a senha no **Secrets Manager** e rotação automática; o histórico é exportado para **S3 + Athena**, e os relatórios de SLA param de competir por CPU com o atendimento.
 
 ---
 
