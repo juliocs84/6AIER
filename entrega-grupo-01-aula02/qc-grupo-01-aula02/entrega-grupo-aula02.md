@@ -2,7 +2,7 @@
 
 **Disciplina:** Cloud & Cognitive Environments — FIAP MBA AI Engineering & Multi-Agents
 **Turma:** 6AIER
-**Data de entrega:** 18/11/2026
+**Data de entrega:** 19/11/2026
 
 ## Grupo
 
